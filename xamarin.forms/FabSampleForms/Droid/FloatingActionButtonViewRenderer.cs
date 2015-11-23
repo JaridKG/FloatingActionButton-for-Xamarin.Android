@@ -152,10 +152,10 @@ namespace FabSampleForms.Droid
 
 		void Fab_Click (object sender, EventArgs e)
 		{
-			var clicked = Element.Clicked;
-			if(Element != null && clicked != null)
+			var clicked = Element.FabClicked;
+			if(Element != null && clicked != null && clicked.CanExecute(null))
 			{
-				clicked(sender, e);
+				clicked.Execute(null);
 			}
 		}
 	}

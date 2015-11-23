@@ -41,6 +41,15 @@ namespace FabSampleForms
 					await Task.Delay(1500);
 					fab.Show();
 				},
+				FabClicked = new Command(async o => 
+				{
+					var animate = await this.DisplayAlert("Fab", "Hide and show the Fab?", "Sure", "Not now");
+					if (!animate) return;
+
+					fab.Hide();
+					await Task.Delay(1500);
+					fab.Show();
+				})
 			};
 
 			// Main page layout

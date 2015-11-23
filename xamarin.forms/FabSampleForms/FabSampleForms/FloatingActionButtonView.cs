@@ -1,5 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
+using System.Windows.Input;
 
 namespace FabSampleForms
 {
@@ -45,6 +46,13 @@ namespace FabSampleForms
 		{
 			get { return (bool)GetValue (HasShadowProperty); } 
 			set { SetValue (HasShadowProperty, value); } 
+		}
+
+		public static readonly BindableProperty FabClickedCommand = BindableProperty.Create<FloatingActionButtonView, ICommand>( p => p.FabClicked, null);
+		public ICommand FabClicked
+		{
+			get { return (ICommand)GetValue(FabClickedCommand); }
+			set { SetValue (FabClickedCommand, value); }
 		}
 
 		public delegate void ShowHideDelegate(bool animate = true);
