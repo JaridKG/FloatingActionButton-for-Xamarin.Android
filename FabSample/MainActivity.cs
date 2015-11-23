@@ -15,7 +15,7 @@ using RecyclerView = Android.Support.V7.Widget.RecyclerView;
 namespace FabSample
 {
   [Activity(Label = "FabSample", MainLauncher = true, Icon = "@drawable/ic_launcher")]
-  public class MainActivity : ActionBarActivity, ActionBar.ITabListener
+  public class MainActivity : AppCompatActivity, ActionBar.ITabListener, IDialogInterfaceOnClickListener
   {
     int count = 1;
 
@@ -47,6 +47,15 @@ namespace FabSample
       tab3.SetTabListener(this);
       tab3.SetText("ScrollView");
       actionBar.AddTab(tab3);
+
+	  if ((int)Build.VERSION.SdkInt >= 21)
+	  {
+		var tab4 = actionBar.NewTab();
+			  tab4.SetTabListener(this);
+			  tab4.SetText("Custom FAB");
+			  actionBar.AddTab(tab4);
+	  }
+	  
     }
 
     public void OnTabReselected(ActionBar.Tab tab, Android.Support.V4.App.FragmentTransaction ft)
@@ -66,6 +75,9 @@ namespace FabSample
         case "ScrollView":
           ft.Replace(Android.Resource.Id.Content, new ScrollViewFragment());
           break;
+		case "Custom FAB":
+		  ft.Replace(Android.Resource.Id.Content, new CustomFABFragment());
+		  break;
       }
     }
 
@@ -86,16 +98,18 @@ namespace FabSample
       {
         var text = (TextView)LayoutInflater.Inflate(Resource.Layout.about_view, null);
         text.TextFormatted = (Html.FromHtml(GetString(Resource.String.about_body)));
-        new AlertDialog.Builder(this)
+        new Android.Support.V7.App.AlertDialog.Builder(this)
         .SetTitle(Resource.String.about)
         .SetView(text)
         .SetInverseBackgroundForced(true)
-        .SetPositiveButton(Android.Resource.String.Ok, (sender, args) =>
-        {
-          ((IDialogInterface)sender).Dismiss();
-        }).Create().Show();
+        .SetPositiveButton(Android.Resource.String.Ok, this).Create().Show();
       }
       return base.OnOptionsItemSelected(item);
+    }
+
+    public void OnClick(IDialogInterface dialog, int which)
+    {
+      dialog.Dismiss();
     }
   }
 
@@ -216,6 +230,47 @@ namespace FabSample
     {
       Console.WriteLine("ScrollViewFragment: OnScrollChanged");
     }
+  }
+
+  public class CustomFABFragment : Android.Support.V4.App.Fragment, IScrollDirectorListener, AbsListView.IOnScrollListener
+  {
+	  public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	  {
+		  var root = inflater.Inflate(Resource.Layout.fragment_listview_custom_fab, container, false);
+
+		  var list = root.FindViewById<ListView>(Android.Resource.Id.List);
+		  var adapter = new ListViewAdapter(Activity, Resources.GetStringArray(Resource.Array.countries));
+		  list.Adapter = adapter;
+
+		  var fab = root.FindViewById<CustomFAB>(Resource.Id.fab);
+		  fab.AttachToListView(list, this, this);
+		  int x = 0;
+		  fab.Click += (sender, args) =>
+		  {
+			  fab.SelectedIndex = ++x % 2;
+		  };
+		  return root;
+	  }
+
+	  public void OnScrollDown()
+	  {
+		  Console.WriteLine("ListViewFragment: OnScrollDown");
+	  }
+
+	  public void OnScrollUp()
+	  {
+		  Console.WriteLine("ListViewFragment: OnScrollUp");
+	  }
+
+	  public void OnScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+	  {
+		  Console.WriteLine("ListViewFragment: OnScroll");
+	  }
+
+	  public void OnScrollStateChanged(AbsListView view, ScrollState scrollState)
+	  {
+		  Console.WriteLine("ListViewFragment: OnScrollChanged");
+	  }
   }
 }
 
